@@ -246,9 +246,11 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler("trending", trending))
     app.add_handler(CommandHandler("off", off))
     app.add_handler(CommandHandler("add", add))
-import time
-while True:
-    time.sleep(60)
+app.post_init = lambda _: asyncio.create_task(set_jobs(app))
+
+print("Nixcabot running with full features and real-time trade tracking")
+app.run_polling()
+
 
     app.post_init = lambda _: asyncio.create_task(set_jobs(app))
 
