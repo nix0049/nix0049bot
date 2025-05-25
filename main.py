@@ -250,7 +250,17 @@ app.post_init = on_startup
     app.add_handler(CommandHandler("trending", trending))
     app.add_handler(CommandHandler("off", off))
     app.add_handler(CommandHandler("add", add))
-app.post_init = lambda _: asyncio.create_task(set_jobs(app))
+async def on_startup(app):
+    await set_jobs(app)
+
+app.post_init = on_startup
+
+app = ApplicationBuilder().token(BOT_TOKEN).build()
+
+app.add_handler(CommandHandler("start", start))
+app.add_handler(CommandHandler("ca", ca))
+...
+
 
 print("Nixcabot running with full features and real-time trade tracking")
 app.run_polling()
