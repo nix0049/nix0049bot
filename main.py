@@ -251,8 +251,3 @@ app.post_init = lambda _: asyncio.create_task(set_jobs(app))
 print("Nixcabot running with full features and real-time trade tracking")
 app.run_polling()
 
-
-    app.post_init = lambda _: asyncio.create_task(set_jobs(app))
-
-    print("Nixcabot running with full features and real-time trade tracking")
-    app.run_polling()
