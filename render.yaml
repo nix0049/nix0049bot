@@ -1,0 +1,7 @@
+services:
+  - type: worker
+    name: nix0049bot
+    runtime: python
+    buildCommand: ""
+    startCommand: python main.py
+    autoDeploy: true
