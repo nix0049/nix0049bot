@@ -232,7 +232,11 @@ async def set_jobs(app):
     app.create_task(track_pumpfun_activity(app))
     app.create_task(track_solana_ws(app))
 
-if __name__ == '__main__':
+async def on_startup(app):
+    await set_jobs(app)
+
+app.post_init = on_startup
+
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
