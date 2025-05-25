@@ -246,6 +246,9 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler("trending", trending))
     app.add_handler(CommandHandler("off", off))
     app.add_handler(CommandHandler("add", add))
+import time
+while True:
+    time.sleep(60)
 
     app.post_init = lambda _: asyncio.create_task(set_jobs(app))
 
