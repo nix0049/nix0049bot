@@ -9,7 +9,7 @@ import websockets
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
 from telegram.constants import ParseMode
 from telegram.ext import (
-    ApplicationBuilder, CommandHandler, ContextTypes, CallbackContext
+    ApplicationBuilder, CommandHandler, ContextTypes
 )
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -34,7 +34,6 @@ keyboard = ReplyKeyboardMarkup(
 
 watched_contracts = set()
 
-# ========== أوامر البوت ==========
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = "Welcome to Nixcabot!"
     if TWITTER_HANDLE:
@@ -108,7 +107,6 @@ async def trending(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def off(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Alerts turned off.")
 
-# ========== تحليل العملة ==========
 async def send_token_analysis(update, token):
     try:
         url = f"https://api.dexscreener.com/latest/dex/pairs/solana/{token}"
@@ -134,7 +132,11 @@ async def send_token_analysis(update, token):
     except Exception as e:
         await update.message.reply_text(f"Error: {e}")
 
-# ========== تتبع Jupiter ==========
+async def set_jobs(app):
+    app.create_task(track_jupiter_trades(app))
+    app.create_task(track_pumpfun_activity(app))
+    app.create_task(track_solana_ws(app))
+
 async def track_jupiter_trades(app):
     async with aiohttp.ClientSession() as session:
         while True:
@@ -172,7 +174,6 @@ async def track_jupiter_trades(app):
                     logging.warning(f"Jupiter tracking error: {e}")
             await asyncio.sleep(30)
 
-# ========== Pump.fun ==========
 async def track_pumpfun_activity(app):
     async with aiohttp.ClientSession() as session:
         while True:
@@ -196,7 +197,6 @@ async def track_pumpfun_activity(app):
                 logging.warning(f"PumpFun tracking error: {e}")
             await asyncio.sleep(60)
 
-# ========== Solana WebSocket ==========
 async def track_solana_ws(app):
     uri = "wss://api.mainnet-beta.solana.com"
     while True:
@@ -226,17 +226,10 @@ async def track_solana_ws(app):
             logging.warning(f"Solana WebSocket error: {e}")
         await asyncio.sleep(15)
 
-# ========== تشغيل البوت ==========
-async def set_jobs(app):
-    app.create_task(track_jupiter_trades(app))
-    app.create_task(track_pumpfun_activity(app))
-    app.create_task(track_solana_ws(app))
-
 async def on_startup(app):
     await set_jobs(app)
 
-app.post_init = on_startup
-
+if __name__ == '__main__':
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
@@ -250,3 +243,8 @@ app.post_init = on_startup
     app.add_handler(CommandHandler("trending", trending))
     app.add_handler(CommandHandler("off", off))
     app.add_handler(CommandHandler("add", add))
+
+    app.post_init = on_startup
+
+    print("Nixcabot running with full features and real-time trade tracking")
+    app.run_polling()
