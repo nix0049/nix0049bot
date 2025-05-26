@@ -250,5 +250,3 @@ app.post_init = on_startup
     app.add_handler(CommandHandler("trending", trending))
     app.add_handler(CommandHandler("off", off))
     app.add_handler(CommandHandler("add", add))
-async def on_startup(app):
-    await set_jobs(app)
